@@ -2,7 +2,9 @@
 
 namespace App\Traits;
 
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Nette\Utils\Json;
 use Throwable;
 
 trait ValidationTrait {
@@ -29,14 +31,16 @@ trait ValidationTrait {
             // Handle error here
         }
     }
-    public function loginValidationTrait($data) {
+
+
+    public function loginValidationTrait($data){
         try {
             $rules = [
-                'login' => 'required|string', // Can be email or mobile
+                'login' => 'required|string',
                 'password' => 'required|string|min:5',
             ];
 
-            $message = [
+            $customMessages = [
                 'login.required' => 'The email or mobile field is required',
                 'login.string' => 'The email or mobile must be a valid string',
                 'password.required' => 'The password field is required',
@@ -44,13 +48,42 @@ trait ValidationTrait {
                 'password.min' => 'The password must be at least 6 characters',
             ];
 
-            dd($rules);
-            // return Validator::make($data, $rules, $message); 
+            $errors = [];
+
+            foreach ($rules as $field => $ruleString) {
+                $ruleArray = explode('|', $ruleString);
+                foreach ($ruleArray as $rule) {
+                    if ($rule === 'required') {
+                        if (!isset($data[$field]) || trim($data[$field]) === '') {
+                            $errors[$field] = $customMessages[$field . '.required'] ?? ucfirst($field) . ' is required';
+                            break;
+                        }
+                    }
+
+                    if ($rule === 'string') {
+                        if (isset($data[$field]) && !is_string($data[$field])) {
+                            $errors[$field] = $customMessages[$field . '.string'] ?? ucfirst($field) . ' must be a valid string';
+                            break;
+                        }
+                    }
+
+                    if (str_starts_with($rule, 'min:')) {
+                        $minValue = (int) str_replace('min:', '', $rule);
+                        if (isset($data[$field]) && strlen($data[$field]) < $minValue) {
+                            $errors[$field] = $customMessages[$field . '.min'] ?? ucfirst($field) . " must be at least $minValue characters";
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return $errors;
 
         } catch (Throwable $th) {
-            // Handle error here
+            return ['server' => $th->getMessage()];
         }
     }
+
 
     public function rescuerValidationTrait($data) {
         try {

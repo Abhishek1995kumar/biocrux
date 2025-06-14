@@ -58,20 +58,23 @@ class AuthController extends Controller {
 
     public function checkUser(Request $request) {
         try {
-            $validator = $this->loginValidationTrait($request->all());
-            if ($validator->fails()) {
+            $errors = $this->loginValidationTrait($request->all());
+
+            if (!empty($errors)) {
                 return response()->json([
                     'status' => 400,
                     'message' => 'Validation Error',
-                    'errors' => $validator->errors()
+                    'errors' => $errors
                 ]);
             }
-            return $this->loginTrait($request);      
+            // dd("hello abhishek : return to login page if validation passed");
+            return $this->loginTrait($request); 
 
-        } catch(Throwable $e) {
+        } catch (Throwable $e) {
             return redirect('/admin/login')->with(['error' => $e->getMessage()]);
         }
     }
+
 
     public function logout() {
         try {

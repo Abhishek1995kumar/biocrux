@@ -11,7 +11,7 @@ if(!function_exists('secure')) {
                 return null; 
             }
 
-            $encode = 
+            $encode = "";
 
         } catch(Throwable $th) {
             // Handle any exceptions that occur during encryption
