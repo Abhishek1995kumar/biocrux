@@ -59,7 +59,9 @@ class AuthController extends Controller {
     public function checkUser(Request $request) {
         try {
             $errors = $this->loginValidationTrait($request->all());
-
+            errorLog(
+                $request->all(),
+            );
             if (!empty($errors)) {
                 return response()->json([
                     'status' => 400,

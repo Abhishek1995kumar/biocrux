@@ -1,4 +1,6 @@
 <?php 
+
+use Illuminate\Support\Facades\DB;
 // status/error/api statuscode
 const HTTP_CONTINUE                                                  = 100;
 const HTTP_SWITCHING_PROTOCOLS                                       = 101;
@@ -127,3 +129,34 @@ const statusTexts = array(
     510 => 'Not Extended',                                                // RFC2774
     511 => 'Network Authentication Required',                             // RFC6585
 );
+
+if (!function_exists('qy')) {
+    /**
+     * Enable query log and/or print the last executed query.
+     * 
+     * Usage:
+     *   queryHelper('enable'); // Enable query log
+     *   queryHelper('print');  // Print last executed query
+     */
+    function qy($action = null) {
+        if ($action === 'enable') {
+            print_r(DB::enableQueryLog());
+        } elseif ($action === 'print') {
+            $queries = DB::getQueryLog();
+            if (!empty($queries)) {
+                $lastQuery = end($queries);
+                // Print query with bindings replaced
+                $sql = $lastQuery['query'];
+                foreach ($lastQuery['bindings'] as $binding) {
+                    $value = is_numeric($binding) ? $binding : "'{$binding}'";
+                    $sql = preg_replace('/\?/', $value, $sql, 1);
+                }
+                echo "<pre>"; print_r($sql); echo "</pre>";
+                echo "<pre>Time: " . $lastQuery['time'] . " ms</pre>";
+            } else {
+                echo "No queries logged.";
+            }
+        }
+    }
+}
+

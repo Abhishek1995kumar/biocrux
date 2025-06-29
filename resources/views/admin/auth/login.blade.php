@@ -1,16 +1,13 @@
 @extends('layouts.auth')
-
 @section('title', 'Login')
-
 @section('header')
 @endsection
-
 @section('content')
-
 <div class="d-flex flex-column-fluid flex-lg-row-auto justify-content-center justify-content-lg-end p-5">
 	<div class="bg-body d-flex flex-center rounded-4 w-md-600px p-5">
 		<div class="w-md-500px">
-			<form class="form " novalidate="novalidate" id="kt_sign_in_form" action="{{ url('/auth') }}" method="post">
+			<form class="form " novalidate="novalidate" id="kt_sign_in_form" action="{{ url('/auth') }}" method="post" enctype="multipart/form-data">
+				@csrf
 				<div class="text-center mb-11">
 					<div class="">
 						<img alt="Logo" src="{{ asset('/assets/media/logos/logos.png')}} " class="mb-5" style="height: 100px;" />
@@ -40,7 +37,6 @@
 	</div>
 </div>
 @endsection
-
 @section('footer')
 <script src="{{asset('assets/js/custom/authentication/sign-in/general.js')}}"></script>
 @endsection

@@ -48,25 +48,50 @@ var KTModalAdd = function () {
                         url: "/admin/auth",
                         data: {
                             login: loginn,
-                            password: passwordd
+                            password: passwordd,
+                            _token: '{{ csrf_token() }}'
+                            // _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
                         },
                         dataType: "json",
                         success: function (response) {
-                            if (response.status == 200) {
-                                swal.fire({
-                                    text: "Your credentials matches our record",
-                                    icon: "success",
-                                    showConfirmButton: false
-                                }).then(function () {
-                                    KTUtil.scrollTop();
-                                });
-                                const work = async () => {
-                                    await sleep(1000);
-                                    swal.close();
-                                    window.location = "/admin/dashboard";
-                                };
-                                work();
-                            } else if (response.status == 201) {
+                            // if (response.status == 200) {
+                            //     swal.fire({
+                            //         text: "Your credentials matches our record",
+                            //         icon: "success",
+                            //         showConfirmButton: false
+                            //     }).then(function () {
+                            //         KTUtil.scrollTop();
+                            //     });
+                            //     const work = async () => {
+                            //         await sleep(1000);
+                            //         swal.close();
+                            //         window.location = "/admin/dashboard";
+                            //     };
+                            //     work();
+                            //     // const redirectAfterSuccess = async () => {
+                            //     //     await swal.fire({
+                            //     //         text: "Your credentials matches our record",
+                            //     //         icon: "success",
+                            //     //         showConfirmButton: false,
+                            //     //         timer: 1000,
+                            //     //         willClose: () => KTUtil.scrollTop()
+                            //     //     });
+                            //     //     window.location.href = "/admin/dashboard";
+                            //     // };
+
+                            //     // redirectAfterSuccess();
+
+                            // } 
+                        if (response.status == 200) {
+                            swal.fire({
+                                text: "Login successful",
+                                icon: "success",
+                                showConfirmButton: false,
+                                timer: 1000
+                            }).then(() => {
+                                window.location.href = response.redirect_url; // ✅ use redirect_url from backend
+                            });
+                        } else if (response.status == 201) {
                                 swal.fire({
                                     text: "Password is incorrect",
                                     icon: "error",
