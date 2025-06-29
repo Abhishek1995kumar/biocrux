@@ -46,6 +46,7 @@ class AuthController extends Controller {
         ]);
     }
 
+    // Show the login form by this function admin
     public function login() {
         if (Auth::check()) {
             return redirect('admin/dashboard');
@@ -59,9 +60,7 @@ class AuthController extends Controller {
     public function checkUser(Request $request) {
         try {
             $errors = $this->loginValidationTrait($request->all());
-            errorLog(
-                $request->all(),
-            );
+            // errorLog( $request->all(), 'loginValidationTrait');
             if (!empty($errors)) {
                 return response()->json([
                     'status' => 400,

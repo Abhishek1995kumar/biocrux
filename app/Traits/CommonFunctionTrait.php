@@ -277,10 +277,10 @@ trait CommonFunctionTrait {
         }
 
         public function loginTrait($request) {
-            queryHelper('enable');
+            // queryHelper('enable');
             $result = User::where('phone', $request->login)->orWhere('email', $request->login)->first();
-            queryHelper('print');
-            if ($result) {                
+            // queryHelper('print');
+            if ($result) {             
                 if ($result->status == 1 && $result->deleted_at == null && $result->rolee->panelFlag == 1 && $result->login_status == 0) {
                     if (Hash::check($request->post('password'), $result->password)) {
                         $result->login_status = 1;

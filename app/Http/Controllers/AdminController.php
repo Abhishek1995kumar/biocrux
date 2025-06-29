@@ -53,8 +53,7 @@ class AdminController extends Controller {
         $this->notificationService = $notificationService;
     }
 
-    public function indexAdmin()
-    {
+    public function indexAdmin() {
         return view('admin.dashboard');
     }
 
@@ -172,8 +171,6 @@ class AdminController extends Controller {
 
     public function addRole(Request $request)
     {
-        // return $request->all();
-
         $role = new Role;
         $role->name = $request->name;
         $role->slug = Str::slug($request->name, '-');
@@ -260,7 +257,6 @@ class AdminController extends Controller {
 
     public function addUser(Request $request) {
         DB::beginTransaction();
-
         $user = new User;
         $uploadpath = 'media/images/users';
         $image_path = $this->uploadFile($request, 'image', $uploadpath);

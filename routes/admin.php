@@ -28,7 +28,7 @@ Route::post('delete', [AdminController::class, 'delete']);
 Route::group(['middleware' => ['checkUserr']], function () {
     // Dashboard Route
         Route::group(['prefix' => 'dashboard'], function () {
-            Route::get('/', [AdminController::class, 'indexAdmin    '])->name('admin.dashboard');
+            Route::get('/', [AdminController::class, 'indexAdmin'])->name('admin.dashboard');
         });
     // Dashboard Route
 
