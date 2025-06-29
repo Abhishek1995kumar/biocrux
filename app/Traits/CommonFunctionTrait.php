@@ -277,13 +277,15 @@ trait CommonFunctionTrait {
         }
 
         public function loginTrait($request) {
+            // queryHelper('enable');
             $result = User::where('phone', $request->login)->orWhere('email', $request->login)->first();
-            if ($result) {
-                // if ($result->status == 1 && $result->deleted_at == null && $result->rolee->panelFlag == 1 && $result->login_status == 0) {
-                if ($result->status == 1 && $result->deleted_at == null && $result->rolee->panelFlag == 1 ) {
+            // queryHelper('print');
+            if ($result) {             
+                if ($result->status == 1 && $result->deleted_at == null && $result->rolee->panelFlag == 1 && $result->login_status == 0) {
                     if (Hash::check($request->post('password'), $result->password)) {
-                        // $result->login_status = 1;
+                        $result->login_status = 1;
                         $result->api_token = $this->generateTokenTrait();
+                        // dd("if condition inside if condition", $result);
                         $result->save();
                         Auth::login($result);
                         $this->storeLog('Login', 'login', 'Login');
@@ -314,12 +316,12 @@ trait CommonFunctionTrait {
                             'message' => 'Unauthorized User',
                         ]);
                     } 
-                    // elseif ($result->login_status == 1) {
-                    //     return response()->json([
-                    //         'status' => 409,
-                    //         'message' => 'Already User Login',
-                    //     ]);
-                    // }
+                    elseif ($result->login_status == 1) {
+                        return response()->json([
+                            'status' => 409,
+                            'message' => 'Already User Login',
+                        ]);
+                    }
                 }
             } else {
                 return response()->json([
