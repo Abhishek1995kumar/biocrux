@@ -125,7 +125,7 @@ input.nosubmit {
                                 </div>
                                 
                                 <div class="mx-5 my-5">
-                                    <a href="{{ route('admin.user.botler.list') }}" class="btn btn-light p-3"><i class="fa fa-fw fa-refresh"></i>Generate Excel</a>
+                                    <button class="btn btn-light p-3" onclick="generateExcelFile(this)" data-type="botler"><i class="fa fa-fw fa-refresh"></i>Botler Excel</button>
                                 </div>
                             </div>
 
@@ -1008,6 +1008,47 @@ input.nosubmit {
             }
         }
     // Search Botler Data End from here
+
+    function generateExcelFile(button) {
+        let type = $(button).data('type');
+        alert("Generating Excel file for type: " + type); // Debugging line to check type value
+        let url = "{{ route('admin.user.botler.download') }}";
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                type: type
+            },
+            success: function(response) {
+                if (response.success) {
+                    Swal.fire({
+                        title: 'Success',
+                        text: response.message,
+                        icon: 'success',
+                        confirmButtonText: 'Ok'
+                    });
+                    window.location.href = response.file_url;
+                } else {
+                    Swal.fire({
+                        title: 'Error',
+                        text: response.message,
+                        icon: 'error',
+                        confirmButtonText: 'Ok'
+                    });
+                }
+            },
+            error: function(xhr) {
+                console.error("Error generating Excel file:", xhr);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Failed to generate Excel file.',
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
+                });
+            }
+        });
+    }
 </script>
 
 <script>
