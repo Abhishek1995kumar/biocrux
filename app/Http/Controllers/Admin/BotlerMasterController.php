@@ -23,6 +23,7 @@ class BotlerMasterController extends Controller {
     use CommonFunctionTrait, QueryTrait;
     // Botler Management
         public function botlerIndex(Request $request) {
+            //dd("abhishek kumar");
             $botlerHeader = [
                 'Company Logo','Botler Name','Company','Company URL','Color','Added On','Status','Action',
             ];
