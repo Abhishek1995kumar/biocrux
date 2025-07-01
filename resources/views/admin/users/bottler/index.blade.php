@@ -3,7 +3,36 @@
 @section('title','Botler List')
 
 @section('header')
+<style>
+    
+.nosubmitForm {
+  color: #555;
+  display: flex;
+  padding: 2px;
+  border: 1px solid currentColor;
+  border-radius: 5px;
+}
 
+.searchingButton[type="submit"]:focus,
+.nosubmit[type="search"]:focus {
+  box-shadow: 0 0 3px 0 #1183d6;
+  border-color: #1183d6;
+  outline: none;
+}
+
+form.nosubmit {
+ border: none;
+ padding: 0;
+}
+
+input.nosubmit {
+  border: 1px solid #555;
+  width: 100%;
+  padding: 9px 4px 9px 40px;
+   background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' class='bi bi-search' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'%3E%3C/path%3E%3C/svg%3E") no-repeat 13px center;
+}
+
+</style>
 @endsection
 
 @section('breadcrumb')
@@ -86,12 +115,28 @@
             <div class="tab-pane active" id="tab_1">
                 <div class="card-toolbar">
                     <div class="card-title d-flex ">
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBotler" class="btn btn-primary" >
-                            Add Botler
-                        </button>
-                        <div class="d-flex align-items-center position-relative">
-                            <a href="{{ route('admin.user.botler.list') }}" class="btn btn-light p-3"><i class="fa fa-fw fa-refresh"></i>Refresh</a>
+                        <div class="d-flex align-items-center">
+                            <div class="d-flex align-items-center">
+                                <div class="">
+                                    <form class="nosubmit nosubmitForm" id="searchForm">
+                                        @csrf
+                                        <input type="search" name="keyword" id="keyword" class="nosubmit form-control form-control-solid w-250px ps-14" placeholder="Search by keyword" value="{{ request('keyword') }}" />
+                                    </form>
+                                </div>
+                                
+                                <div class="mx-5 my-5">
+                                    <button class="btn btn-light p-3" onclick="generateExcelFile(this)" data-type="botler"><i class="fa fa-fw fa-refresh"></i>Botler Excel</button>
+                                </div>
+                            </div>
+
+                            <div >
+                                <button type="button" class="btn btn-sm btn-success mx-5" data-bs-toggle="modal" data-bs-target="#addBotler">
+                                    Add Botler
+                                </button>
+                            </div>
                         </div>
+
+                        
                     </div>
                     <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_table">
                         <thead>
@@ -885,34 +930,125 @@
 @section('scripts')
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 <script>
-    $(document).ready(function() {
-        $('#kt_table').DataTable({
-            "order": [[ 0, "desc" ]],
-            "pageLength": 10,
-            "lengthMenu": [10, 25, 50, 100],
-            "language": {
-                "search": "",
-                "zeroRecords": "No records found",
-                "info": "",
-                "infoEmpty": "No records available",
-                "infoFiltered": "(filtered from _MAX_ total records)",
-            },
-            buttons: [
-                {
-                    extend: 'excelHtml5',
-                    text: 'Excel',
-                    className: 'btn btn-secondary',
-                }
-            ],
-            dom: '<"d-flex justify-content-between align-items-center"<"d-flex"f><"ml-auto"B>>rt<"d-flex justify-content-between align-items-center mt-3"p>',
+    // $(document).ready(function() {
+    //     $('#kt_table').DataTable({
+    //         "order": [[ 0, "desc" ]],
+    //         "pageLength": 10,
+    //         "lengthMenu": [10, 25, 50, 100],
+    //         "language": {
+    //             "search": "",
+    //             "zeroRecords": "No records found",
+    //             "info": "",
+    //             "infoEmpty": "No records available",
+    //             "infoFiltered": "(filtered from _MAX_ total records)",
+    //         },
+    //         buttons: [
+    //             {
+    //                 extend: 'excelHtml5',
+    //                 text: 'Excel',
+    //                 className: 'btn btn-secondary',
+    //             }
+    //         ],
+    //         dom: '<"d-flex justify-content-between align-items-center"<"d-flex"f><"ml-auto"B>>rt<"d-flex justify-content-between align-items-center mt-3"p>',
+    //     });
+
+    //     $('#kt_table_filter input').attr('placeholder', 'Search...').addClass('form-control p-4 w-100').wrap('<div class="input-group"></div>');
+    //     // Hide the search label
+    //     $('#kt_table_filter label').contents().filter(function() {
+    //         return this.nodeType === 3;
+    //     }).remove();
+    // });
+
+    // Search Botler Data Start from here
+        document.getElementById('searchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            searchForm();
         });
 
-        $('#kt_table_filter input').attr('placeholder', 'Search...').addClass('form-control p-4 w-100').wrap('<div class="input-group"></div>');
-        // Hide the search label
-        $('#kt_table_filter label').contents().filter(function() {
-            return this.nodeType === 3;
-        }).remove();
-    });
+        document.getElementById('keyword').addEventListener('change', function(e) {
+            e.preventDefault();
+            searchForm();
+        });
+
+        function searchForm() {
+            try {
+                let keyword = document.getElementById('keyword').value;
+                alert("Searching for: " + keyword); // Debugging line to check keyword value
+                let url = "{{ route('admin.user.botler.list') }}";
+
+                if(!keyword) {
+                    return false; // Prevent submission if keyword is empty
+                } else {
+                    $.ajax({
+                        url: url,
+                        method: 'GET',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            keyword: keyword
+                        },
+                        success: function(response) {
+                            alert("Search completed successfully!");
+                            if (response.success) {
+                                // Update the table or UI with the new data
+                                $('#kt_table').DataTable().clear().rows.add(response.data).draw();
+                            } else {
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: response.message,
+                                    icon: 'error',
+                                    confirmButtonText: 'Ok'
+                                });
+                            }
+                        },
+                    })
+                }
+
+            } catch (error) {
+                console.error("Error in searchForm function:", error);
+            }
+        }
+    // Search Botler Data End from here
+
+    function generateExcelFile(button) {
+        let type = $(button).data('type');
+        alert("Generating Excel file for type: " + type); // Debugging line to check type value
+        let url = "{{ route('admin.user.botler.download') }}";
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                type: type
+            },
+            success: function(response) {
+                if (response.success) {
+                    Swal.fire({
+                        title: 'Success',
+                        text: response.message,
+                        icon: 'success',
+                        confirmButtonText: 'Ok'
+                    });
+                    window.location.href = response.file_url;
+                } else {
+                    Swal.fire({
+                        title: 'Error',
+                        text: response.message,
+                        icon: 'error',
+                        confirmButtonText: 'Ok'
+                    });
+                }
+            },
+            error: function(xhr) {
+                console.error("Error generating Excel file:", xhr);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Failed to generate Excel file.',
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
+                });
+            }
+        });
+    }
 </script>
 
 <script>
@@ -1546,8 +1682,6 @@
             });
         }
     });
-
-
 </script>
 
 <script>

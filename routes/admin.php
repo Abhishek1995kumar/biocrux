@@ -1,16 +1,16 @@
 <?php
 
-use App\Http\Controllers\Admin\BinMasterController;
-use App\Http\Controllers\Admin\BotlerMasterController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\Admin\MachineMasterController;
 use App\Http\Controllers\Admin\QRBinController;
-use App\Http\Controllers\Admin\SliderMasterController;
+use App\Http\Controllers\Admin\BinMasterController;
 use App\Http\Controllers\Admin\SMSMachineController;
-use App\Http\Controllers\Admin\SubBotlerMasterController;
 use App\Http\Controllers\Admin\ValidMobileController;
+use App\Http\Controllers\Admin\SliderMasterController;
+use App\Http\Controllers\Admin\BotlerMasterController;
+use App\Http\Controllers\Admin\GenerateExcelController;
+use App\Http\Controllers\Admin\MachineMasterController;
 
 // this routes are already prefixed with admin in RouteServiceProvider.php
 
@@ -109,7 +109,7 @@ Route::group(['middleware' => ['checkUserr']], function () {
                 Route::post('sub/machine/edit', [BotlerMasterController::class, 'botlerAssignMachineToSubBotlerUpdate'])->name('admin.user.botler.assign-sub-botler.edit');
                 Route::post('sub-botler-machine/delete/{id}', [BotlerMasterController::class, 'deleteAssignedSubBotlerMachine'])->name('admin.user.botler.assign-sub-botler.delete');
                 
-                // Route::get('detail/{id}', [BotlerMasterController::class, 'botlerDetail'])->name('admin.user.botler.detail');
+                Route::post('generate-excel', [GenerateExcelController::class, 'generateExcel'])->name('admin.user.botler.download');
                 // Route::get('botlers-user/{id}', [BotlerMasterController::class, 'botlerUserIndex'])->name('admin.user.botler.user-list');
                 // Route::get('botlers-sub/{id}', [BotlerMasterController::class, 'subBotlerIndex'])->name('admin.user.sub-botler.list');
 
